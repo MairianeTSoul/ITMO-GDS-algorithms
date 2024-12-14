@@ -265,6 +265,54 @@ TEST(ArrayTest, RemoveElementFromEmptyArray) {
     EXPECT_THROW(arr.remove(0), std::out_of_range);
 }
 
+TEST(ArrayTest, InsertAndAccessStrings) {
+    Array<std::string> arr;
+    arr.insert("Hello");
+    arr.insert("World");
+    arr.insert("Test");
+
+    EXPECT_EQ(arr[0], "Hello");
+    EXPECT_EQ(arr[1], "World");
+    EXPECT_EQ(arr[2], "Test");
+    EXPECT_EQ(arr.size(), 3);
+}
+
+TEST(ArrayTest, InsertStringAtSpecificIndex) {
+    Array<std::string> arr;
+    arr.insert("First");
+    arr.insert("Second");
+    arr.insert("Third");
+    arr.insert(1, "Inserted");
+
+    EXPECT_EQ(arr[0], "First");
+    EXPECT_EQ(arr[1], "Inserted");
+    EXPECT_EQ(arr[2], "Second");
+    EXPECT_EQ(arr[3], "Third");
+    EXPECT_EQ(arr.size(), 4);
+}
+
+TEST(ArrayTest, RemoveStringElement) {
+    Array<std::string> arr;
+    arr.insert("A");
+    arr.insert("B");
+    arr.insert("C");
+    arr.remove(1);
+
+    EXPECT_EQ(arr[0], "A");
+    EXPECT_EQ(arr[1], "C");
+    EXPECT_EQ(arr.size(), 2);
+}
+
+TEST(ArrayTest, InsertStringWithNumbers) {
+    Array<std::string> arr;
+    arr.insert("123");
+    arr.insert("456");
+
+    EXPECT_EQ(arr[0], "123");
+    EXPECT_EQ(arr[1], "456");
+    EXPECT_EQ(arr.size(), 2);
+}
+
 
 int main(int argc, char** argv) {
 //    Array<int> arr;
