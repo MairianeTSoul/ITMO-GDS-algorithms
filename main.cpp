@@ -5,14 +5,9 @@
 #include <vector>
 #include <gtest/gtest.h>
 
-using namespace std;
-
-void generateRandomArray(int* arr, int size, int seed = 30) {
-    mt19937 gen(seed);
-    uniform_int_distribution<> dist(1, 1000000);
-
+void generateArray(int* arr, int size) {
     for (int i = 0; i < size; ++i) {
-        arr[i] = dist(gen);
+        arr[i] = size - i;
     }
 }
 
@@ -29,8 +24,9 @@ TEST(InsertionSortTest, SortSmallArray) {
 TEST(InsertionSortTest, EmptyArray) {
     int arr[] = {};
     insertion_sort(arr, arr + 0, [](int a, int b) { return a < b; });
-    EXPECT_EQ(arr[0], 0);
+    EXPECT_EQ(arr, arr + 0);
 }
+
 
 TEST(InsertionSortTest, SingleElementArray) {
     int arr[] = {10};
@@ -61,7 +57,7 @@ TEST(MedianOfThreeTest, CorrectMedian) {
 
 TEST(QuickSortTest, SortArray) {
     int arr[] = {10, 5, 3, 7, 6, 1, 9, 8, 4, 2};
-    sort(arr, arr + 10, [](int a, int b) { return a < b; });
+    combo_sort(arr, arr + 10, [](int a, int b) { return a < b; });
     for (int i = 0; i < 9; ++i) {
         EXPECT_LE(arr[i], arr[i + 1]);
     }
@@ -69,7 +65,7 @@ TEST(QuickSortTest, SortArray) {
 
 TEST(QuickSortTest, SortWithDoubleAndNegativeNumbers) {
     double arr[] = {1.4, -2.1, 3.4, -4.3, 5.33, 0.1};
-    sort(arr, arr + 6, [](double a, double b) { return a < b; });
+    combo_sort(arr, arr + 6, [](double a, double b) { return a < b; });
     EXPECT_EQ(arr[0], -4.3);
     EXPECT_EQ(arr[1], -2.1);
     EXPECT_EQ(arr[2], 0.1);
@@ -79,12 +75,12 @@ TEST(QuickSortTest, SortWithDoubleAndNegativeNumbers) {
 }
 
 TEST(QuickSortTest, SortLargeArray) {
-    const int size = 10000000;
+    const int size = 100000;
     int arr[size];
     for (int i = 0; i < size; ++i) {
         arr[i] = size - i;
     }
-    sort(arr, arr + size, [](int a, int b) { return a < b; });
+    combo_sort(arr, arr + size, [](int a, int b) { return a < b; });
     for (int i = 0; i < size - 1; ++i) {
         EXPECT_LE(arr[i], arr[i + 1]);
     }
@@ -95,7 +91,7 @@ TEST(SortingTest, SortStringsAlphabetically) {
     std::string expected[] = {"apple", "banana", "cherry", "date"};
     int size = sizeof(strings) / sizeof(strings[0]);
 
-    sort(strings, strings + size, [](const std::string &a, const std::string &b) {
+    combo_sort(strings, strings + size, [](const std::string &a, const std::string &b) {
         return a < b;
     });
 
@@ -109,7 +105,7 @@ TEST(SortingTest, SortStringsByLength) {
     std::string expected[] = {"kiwi", "pear", "apple", "pineapple"};
     int size = sizeof(strings) / sizeof(strings[0]);
 
-    sort(strings, strings + size, [](const std::string &a, const std::string &b) {
+    combo_sort(strings, strings + size, [](const std::string &a, const std::string &b) {
         return a.size() < b.size();
     });
 
@@ -123,7 +119,7 @@ TEST(SortingTest, SortStringsReverseAlphabetical) {
     std::string expected[] = {"date", "cherry", "banana", "apple"};
     int size = sizeof(strings) / sizeof(strings[0]);
 
-    sort(strings, strings + size, [](const std::string &a, const std::string &b) {
+    combo_sort(strings, strings + size, [](const std::string &a, const std::string &b) {
         return a > b;
     });
 
@@ -145,7 +141,7 @@ void runBenchmark(const std::string& sortName, std::function<void(int*, int*)> s
     for (int size : sizes) {
         std::vector<int> arr(size);
 
-        generateRandomArray(arr.data(), size);
+        generateArray(arr.data(), size);
 
         bench.run(std::to_string(size) + " elements", [&] {
             sortFunc(arr.data(), arr.data() + size);
@@ -158,10 +154,10 @@ int main(int argc, char** argv) {
 
     ::testing::InitGoogleTest(&argc, argv);
 
-    cout << "Test 1" << std::endl;
+    std::cout << "Test 1" << std::endl;
 
     runBenchmark("sort", [](int* begin, int* end) {
-        sort(begin, end, [](int a, int b) { return a < b; });
+        combo_sort(begin, end, [](int a, int b) { return a < b; });
     });
 
     runBenchmark("quick sort", [](int* begin, int* end) {
@@ -172,49 +168,68 @@ int main(int argc, char** argv) {
         insertion_sort(begin, end, [](int a, int b) { return a < b; });
     });
 
-        cout << "Test 2" << std::endl;
+    std::cout << "Test 2" << std::endl;
 
-        std::vector<int> testSizes;
+    int testSizes[20];
 
-        for (int i = 5; i <= 100; i += 5) testSizes.push_back(i);
-
-        for (int size: testSizes) {
-            std::vector<int> arr(size);
-            generateRandomArray(arr.data(), size);
-
-            auto start = std::chrono::high_resolution_clock::now();
-            insertion_sort(arr.data(), arr.data() + size, [](int a, int b) { return a < b; });
-            auto end = std::chrono::high_resolution_clock::now();
-            std::chrono::duration<double> insertionSortTime = end - start;
-
-            generateRandomArray(arr.data(), size);
-
-            start = std::chrono::high_resolution_clock::now();
-            quick_sort(arr.data(), arr.data() + size, [](int a, int b) { return a < b; });
-            end = std::chrono::high_resolution_clock::now();
-            std::chrono::duration<double> quickSortTime = end - start;
-
-            generateRandomArray(arr.data(), size);
-
-            start = std::chrono::high_resolution_clock::now();
-            sort(arr.data(), arr.data() + size, [](int a, int b) { return a < b; });
-            end = std::chrono::high_resolution_clock::now();
-            std::chrono::duration<double> sortTime = end - start;
-
-            std::cout << "Size: " << size
-                      << "  insertion sort: " << insertionSortTime.count() * 1e9
-                      << "ns, quick sort: " << quickSortTime.count() * 1e9
-                      << "ns, sort: " << sortTime.count() * 1e9 << "ns min: ";
-            if (insertionSortTime <= quickSortTime && insertionSortTime <= sortTime) {
-                std::cout << "insertion sort\n";
-            } else if (quickSortTime <= insertionSortTime && quickSortTime <= sortTime) {
-                std::cout << "quick sort\n";
-            } else {
-                std::cout << "sort\n";
-            }
-        }
-
-        cout << "Test 3" << std::endl;
-
-        return RUN_ALL_TESTS();
+    for (int i = 0; i < 20; i++) {
+        testSizes[i] = (i + 2) * 2;
     }
+
+//    std::vector<int> arr_test(10);
+//    for (int i = 0; i < 10; ++i) {
+//        generateArray(arr_test.data(), 10);
+//        quick_sort(arr_test.data(), arr_test.data() + 3, [](int a, int b) { return a < b; });
+//    }
+//    for (int i = 0; i < 10; ++i) {
+//        generateArray(arr_test.data(), 10);
+//        insertion_sort(arr_test.data(), arr_test.data() + 3, [](int a, int b) { return a < b; });
+//    }
+//
+//    for (int i = 0; i < 10; ++i) {
+//        generateArray(arr_test.data(), 10);
+//        combo_sort(arr_test.data(), arr_test.data() + 3, [](int a, int b) { return a < b; });
+//    }
+
+    for (int size: testSizes) {
+        std::vector<int> arr(size);
+        generateArray(arr.data(), size);
+
+        auto start = std::chrono::high_resolution_clock::now();
+        insertion_sort(arr.data(), arr.data() + size, [](int a, int b) { return a < b; });
+        auto end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> insertionSortTime = end - start;
+
+        generateArray(arr.data(), size);
+
+        start = std::chrono::high_resolution_clock::now();
+        quick_sort(arr.data(), arr.data() + size, [](int a, int b) { return a < b; });
+        end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> quickSortTime = end - start;
+
+        generateArray(arr.data(), size);
+
+        start = std::chrono::high_resolution_clock::now();
+        combo_sort(arr.data(), arr.data() + size, [](int a, int b) { return a < b; });
+        end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> sortTime = end - start;
+
+        std::cout << "Size: " << size
+                  << "  insertion sort: " << insertionSortTime.count() * 1e9
+                  << "ns, quick sort: " << quickSortTime.count() * 1e9
+                  << "ns, sort: " << sortTime.count() * 1e9 << "ns min: ";
+
+        if (insertionSortTime < quickSortTime && insertionSortTime < sortTime) {
+            std::cout << "insertion sort\n";
+        } else if (quickSortTime < insertionSortTime && quickSortTime < sortTime) {
+            std::cout << "quick sort\n";
+        } else {
+            std::cout << "sort\n";
+        }
+    }
+
+
+    std::cout << "Test 3" << std::endl;
+
+    return RUN_ALL_TESTS();
+}

@@ -42,32 +42,36 @@ T* partition(T* first, T* last, Compare comp) {
 
 template<typename T, typename Compare>
 void quick_sort(T* first, T* last, Compare comp) {
-    if (first >= last) return;
+    while (first < last) {
+        T* pivot = partition(first, last, comp);
 
-    T* pivot = partition(first, last, comp);
-
-    quick_sort(first, pivot, comp);
-    quick_sort(pivot + 1, last, comp);
+        if (pivot - first < last - pivot) {
+            combo_sort(first, pivot, comp);
+            first = pivot + 1;
+        } else {
+            combo_sort(pivot + 1, last, comp);
+            last = pivot - 1;
+        }
+    }
 }
 
 template<typename T, typename Compare>
-void sort(T* first, T* last, Compare comp) {
-    const int threshold = 32;
+void combo_sort(T* first, T* last, Compare comp) {
+    const int threshold = 12;
 
     while (first < last) {
         if (last - first <= threshold) {
             insertion_sort(first, last, comp);
             break;
         }
-
         T* pivot = partition(first, last, comp);
 
         if (pivot - first < last - pivot) {
-            sort(first, pivot, comp);
+            combo_sort(first, pivot, comp);
             first = pivot + 1;
         } else {
-            sort(pivot + 1, last, comp);
-            last = pivot;
+            combo_sort(pivot + 1, last, comp);
+            last = pivot - 1;
         }
     }
 }
