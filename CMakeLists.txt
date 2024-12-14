@@ -14,8 +14,8 @@ FetchContent_MakeAvailable(googletest)
 add_executable(ITMO-GDS-algorithms
         array.hpp
         array.h
-        tests.cpp
-#        main.cpp
+#        tests.cpp
+        main.cpp
         )
 target_link_libraries(ITMO-GDS-algorithms gtest_main)
 add_test(NAME example_test COMMAND example)
