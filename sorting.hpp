@@ -52,7 +52,7 @@ void quick_sort(T* first, T* last, Compare comp) {
 
 template<typename T, typename Compare>
 void sort(T* first, T* last, Compare comp) {
-    const int threshold = 31;
+    const int threshold = 32;
 
     while (first < last) {
         if (last - first <= threshold) {
