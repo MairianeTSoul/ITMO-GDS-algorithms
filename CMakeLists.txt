@@ -12,9 +12,7 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 add_executable(ITMO-GDS-algorithms
-#        QuickSort.h
         sorting.hpp
-#        tests.cpp
         main.cpp
         )
 target_link_libraries(ITMO-GDS-algorithms gtest_main)
